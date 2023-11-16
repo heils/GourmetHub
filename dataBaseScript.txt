@@ -1,0 +1,98 @@
+-- Create Users table
+CREATE TABLE IF NOT EXISTS Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'editor', 'subscriber') NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    contact_info TEXT
+) ENGINE=InnoDB;
+
+-- Create Restaurants table with an image column
+CREATE TABLE IF NOT EXISTS Restaurants (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    location TEXT NOT NULL,
+    cuisine_type VARCHAR(50),
+    image_url VARCHAR(255) -- Column added for restaurant image
+) ENGINE=InnoDB;
+
+-- Create Menus table with an image column
+CREATE TABLE IF NOT EXISTS Menus (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    description TEXT,
+    restaurant_id INT,
+    image_url VARCHAR(255), -- Column added for menu item image
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Create Orders table
+CREATE TABLE IF NOT EXISTS Orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    status ENUM('pending', 'confirmed', 'delivered', 'cancelled') NOT NULL,
+    payment_info TEXT,
+    user_id INT,
+    restaurant_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
+    FOREIGN KEY (restaurant_id) REFERENCES Restaurants(id)
+) ENGINE=InnoDB;
+
+-- Create Posts table
+CREATE TABLE IF NOT EXISTS Posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    user_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- Create Comments table
+CREATE TABLE IF NOT EXISTS Comments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT NOT NULL,
+    user_id INT,
+    post_id INT,
+    FOREIGN KEY (user_id) REFERENCES Users(id) ON DELETE SET NULL,
+    FOREIGN KEY (post_id) REFERENCES Posts(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- Add the Menu-Order many-to-many relationship
+CREATE TABLE IF NOT EXISTS Order_Menu (
+    order_id INT,
+    menu_id INT,
+    quantity INT DEFAULT 1,
+    FOREIGN KEY (order_id) REFERENCES Orders(id) ON DELETE CASCADE,
+    FOREIGN KEY (menu_id) REFERENCES Menus(id) ON DELETE CASCADE,
+    PRIMARY KEY (order_id, menu_id)
+) ENGINE=InnoDB;
+
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Peasant Cookery', '283 Bannatyne Ave, Winnipeg, MB R3B 1M3', 'Restaurant', '/GourmetHub/resources/restaurantImages/Peasant.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Chosabi King', '100 King St A, Winnipeg, MB R3B 0P6', 'Asian restaurant', '/GourmetHub/resources/restaurantImages/Chosabi.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Clementine Cafe', '123 Princess St, Winnipeg, MB R3B 1K8, MB R3B 1G6', 'Breakfast restaurant', '/GourmetHub/resources/restaurantImages/Clementine.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Bodegoes Old Market Square', '123 Princess St, Winnipeg, 211 Bannatyne Ave #102, Winnipeg, MB R3B 1M3', 'Restaurant', '/GourmetHub/resources/restaurantImages/Bodegoes.png');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Deer + Almond', '123 Princess St, Winnipeg, 85 Princess St, Winnipeg, MB R3B 1K4', 'Restaurant', '/GourmetHub/resources/restaurantImages/Deer.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Daanook Restaurant', '123 Princess St, Winnipeg, 58 Albert St, Winnipeg, MB R3B 1E7', 'Syrian restaurant', '/GourmetHub/resources/restaurantImages/Daanook.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Hermanos Restaurant & Wine Bar', '179 Bannatyne Ave, Winnipeg, MB R3B 0R5', 'South American restaurant', '/GourmetHub/resources/restaurantImages/Hermanos.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Velvet Glove Restaurant', '2 Lombard Place, Winnipeg, MB R3B 0Y3', 'Restaurant', '/GourmetHub/resources/restaurantImages/Velvet.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('The Merchant Kitchen', '314 Donald St, Winnipeg, MB R3B 2H3', 'Asian fusion restaurant', '/GourmetHub/resources/restaurantImages/Merchant.jpg');
+INSERT INTO Restaurants (name, location, cuisine_type, image_url)
+VALUES ('Vinh Long', '360 Main St, Winnipeg, MB R3C 3Z4', 'Vietnamese restaurant', '/GourmetHub/resources/restaurantImages/Vinh.jpg');
+
+
+INSERT INTO Menus (name, price, description, restaurant_id, image_url)
+VALUES ('Kung Pau', 9.75, 'Hoisin base, kung pau red chilli flake sauce, tomato, onion, mushroom, broccoli, water chestnut, carrot. Your choice of protein and noodles. Garnished with chilli pepper.', 4, '/GourmetHub/resources/KungPao.jpg');
+INSERT INTO Menus (name, price, description, restaurant_id, image_url)
+VALUES ('Ghostpepper Vindaloo', 9.75, 'Coconut milk base sauce, ghost pepper adobe, vindaloo sauce. Tomato, mushroom, water chestnuts, carrot, pineapple. Your choice of protein and noodles. Garnished with bean sprouts and a lemon.', 4, '/GourmetHub/resources/Ghostpepper.jpg');
+INSERT INTO Menus (name, price, description, restaurant_id, image_url)
+VALUES ('Chosabi Burrito', 17.95, 'Delicious burrito filled with wild sockeye salmon, bigeye tuna, crab meat, cucumber, tempura flakes, spicy aioli, avocado, and sushi rice.', 2, '/GourmetHub/resources/Chosabi.jpg');
